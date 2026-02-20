@@ -1,15 +1,26 @@
 {
   "domain": "insurance",
   "risk_triggers": {
-    "legal_words": ["IRDAI", "claim dispute", "legal notice"],
-    "escalation_keywords": ["complaint", "ombudsman"],
+    "legal_words": ["IRDAI", "claim dispute", "legal notice", "ombudsman"],
+    "escalation_keywords": ["complaint", "legal action", "policy cancellation"],
     "negative_sentiment_threshold": "very_negative"
   },
   "outcome_rules": {
-    "escalated_keywords": ["legal notice", "ombudsman"],
-    "churn_keywords": ["cancel policy"],
-    "resolved_keywords": ["claim approved", "settlement done"],
+    "escalated_keywords": ["legal notice", "ombudsman", "complaint filed"],
+    "churn_keywords": ["cancel policy", "terminate policy"],
+    "resolved_keywords": ["claim approved", "settlement done", "claim processed"],
     "followup_keywords": ["document pending", "verification required"]
+  },
+  "compliance_rules": {
+    "forbidden_promises": [
+      "guaranteed claim approval",
+      "100% claim settlement",
+      "no documents required"
+    ],
+    "regulatory_keywords": [
+      "IRDAI complaint",
+      "mis-selling"
+    ]
   },
   "scoring_weights": {
     "sentiment": 0.4,

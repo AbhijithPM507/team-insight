@@ -1,30 +1,43 @@
 from fastapi import APIRouter, HTTPException
 from app.models.request_models import AnalyzeRequest
-from app.models.response_models import AnalyzeResponse
+from app.services.analysis_service import run_full_analysis
 
 router = APIRouter()
 
 
-@router.post("/analyze", response_model=AnalyzeResponse)
-async def analyze(request: AnalyzeRequest):
-    try:
-        # Temporary stub response (Dev 2 & 3 will replace this)
-        return AnalyzeResponse(
-            conversation_summary="Processing pending AI integration.",
-            languages_detected=["Unknown"],
-            sentiment_overall="Neutral",
-            timeline_emotion_analysis=[],
-            primary_intents=[],
-            key_entities=[],
-            risk_analysis={
-                "compliance_risk_score": 0,
-                "escalation_probability": 0.0,
-                "churn_risk": 0.0,
-                "risk_contributors": []
-            },
-            call_outcome_prediction="Unknown",
-            agent_performance_score=0,
-            policy_flags=[]
+@router.post("/analyze")
+def analyze(request: AnalyzeRequest):
+    """
+    Main analysis endpoint.
+    """
+
+    # 🔹 Validate domain
+    if not request.client_config or "domain" not in request.client_config:
+        raise HTTPException(
+            status_code=400,
+            detail="Domain must be provided inside client_config"
         )
+
+    domain = request.client_config.get("domain")
+
+    # 🔹 Use transcript for now (Dev 2 AI not integrated yet)
+    if request.transcript:
+        conversation_text = request.transcript
+    else:
+        conversation_text = "Audio input received"
+
+    # 🔥 TEMPORARY AI OUTPUT (Replace when Dev 2 connects)
+    ai_output = {
+        "summary": conversation_text,
+        "sentiment": "very_negative",
+        "intents": ["cancel connection"]
+    }
+
+    try:
+        return run_full_analysis(ai_output, domain)
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal processing error")

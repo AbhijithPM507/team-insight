@@ -1,15 +1,26 @@
 {
   "domain": "telecom",
   "risk_triggers": {
-    "legal_words": ["TRAI", "consumer court", "complaint"],
+    "legal_words": ["TRAI", "consumer court", "complaint filed"],
     "escalation_keywords": ["manager", "port out", "cancel connection"],
     "negative_sentiment_threshold": "very_negative"
   },
   "outcome_rules": {
-    "escalated_keywords": ["manager", "escalate"],
-    "churn_keywords": ["port out", "cancel connection"],
-    "resolved_keywords": ["issue resolved", "network fixed"],
-    "followup_keywords": ["technician visit", "call back"]
+    "escalated_keywords": ["escalate", "complaint registered"],
+    "churn_keywords": ["port out", "cancel connection", "switch provider"],
+    "resolved_keywords": ["network fixed", "issue resolved", "plan updated"],
+    "followup_keywords": ["technician visit", "call back", "service request"]
+  },
+  "compliance_rules": {
+    "forbidden_promises": [
+      "lifetime free plan",
+      "unlimited forever",
+      "no hidden charges guaranteed"
+    ],
+    "regulatory_keywords": [
+      "TRAI violation",
+      "billing fraud"
+    ]
   },
   "scoring_weights": {
     "sentiment": 0.5,

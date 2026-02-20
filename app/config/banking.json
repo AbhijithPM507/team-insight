@@ -1,22 +1,31 @@
 {
   "domain": "banking",
   "risk_triggers": {
-    "legal_words": ["fraud", "complaint", "RBI", "court"],
+    "legal_words": ["fraud", "RBI", "court", "legal notice"],
     "escalation_keywords": ["manager", "close account", "cancel card"],
     "negative_sentiment_threshold": "very_negative"
   },
   "outcome_rules": {
     "escalated_keywords": ["manager", "escalate"],
     "churn_keywords": ["close account", "cancel card"],
-    "resolved_keywords": ["issue resolved", "problem fixed"],
-    "followup_keywords": ["call back", "follow up"]
+    "resolved_keywords": ["issue resolved", "problem fixed", "transaction reversed"],
+    "followup_keywords": ["call back", "follow up", "visit branch"]
   },
   "compliance_rules": {
-    "forbidden_promises": ["guaranteed return"]
+    "forbidden_promises": [
+      "guaranteed return",
+      "100% safe investment",
+      "no risk investment",
+      "assured profit"
+    ],
+    "regulatory_keywords": [
+      "RBI violation",
+      "unauthorized transaction"
+    ]
   },
   "scoring_weights": {
     "sentiment": 0.4,
     "keywords": 0.3,
     "intent": 0.3
   }
-} 
+}
