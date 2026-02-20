@@ -1,11 +1,22 @@
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 from typing import Optional, Dict, Any
 
 
 class AnalyzeRequest(BaseModel):
-    transcript: Optional[str] = None
-    audio_base64: Optional[str] = None
-    client_config: Dict[str, Any]
+    transcript: Optional[str] = Field(
+        default=None,
+        description="Text-based customer conversation transcript"
+    )
+
+    audio_base64: Optional[str] = Field(
+        default=None,
+        description="Base64 encoded audio file"
+    )
+
+    client_config: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Client configuration influencing analysis"
+    )
 
     @model_validator(mode="after")
     def validate_input(self):

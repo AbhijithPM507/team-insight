@@ -1,23 +1,30 @@
 from fastapi import APIRouter, HTTPException
 from app.models.request_models import AnalyzeRequest
 from app.models.response_models import AnalyzeResponse
-from app.services.analysis_service import run_full_analysis
-from app.services.webhook_service import send_to_n8n
 
 router = APIRouter()
 
 
 @router.post("/analyze", response_model=AnalyzeResponse)
-def analyze(request: AnalyzeRequest):
-
+async def analyze(request: AnalyzeRequest):
     try:
-        result = run_full_analysis(request)
-
-        # Optional orchestration trigger
-        if request.client_config.get("enable_workflow", False):
-            send_to_n8n(result.dict())
-
-        return result
-
+        # Temporary stub response (Dev 2 & 3 will replace this)
+        return AnalyzeResponse(
+            conversation_summary="Processing pending AI integration.",
+            languages_detected=["Unknown"],
+            sentiment_overall="Neutral",
+            timeline_emotion_analysis=[],
+            primary_intents=[],
+            key_entities=[],
+            risk_analysis={
+                "compliance_risk_score": 0,
+                "escalation_probability": 0.0,
+                "churn_risk": 0.0,
+                "risk_contributors": []
+            },
+            call_outcome_prediction="Unknown",
+            agent_performance_score=0,
+            policy_flags=[]
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
