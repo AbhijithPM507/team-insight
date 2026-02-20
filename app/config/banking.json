@@ -1,15 +1,15 @@
 {
   "domain": "banking",
   "risk_triggers": {
-    "legal_words": ["fraud", "RBI", "court", "legal notice"],
-    "escalation_keywords": ["manager", "close account", "cancel card"],
+    "legal_words": ["fraud", "rbi", "court", "legal notice", "unauthorized transaction"],
+    "escalation_keywords": ["close_account", "legal_action", "complaint"],
     "negative_sentiment_threshold": "very_negative"
   },
   "outcome_rules": {
-    "escalated_keywords": ["manager", "escalate"],
-    "churn_keywords": ["close account", "cancel card"],
-    "resolved_keywords": ["issue resolved", "problem fixed", "transaction reversed"],
-    "followup_keywords": ["call back", "follow up", "visit branch"]
+    "escalated_keywords": ["complaint", "legal"],
+    "churn_keywords": ["close_account"],
+    "resolved_keywords": ["blocked", "issue resolved", "card blocked"],
+    "followup_keywords": ["follow up", "call back"]
   },
   "compliance_rules": {
     "forbidden_promises": [
@@ -17,11 +17,27 @@
       "100% safe investment",
       "no risk investment",
       "assured profit"
-    ],
-    "regulatory_keywords": [
-      "RBI violation",
-      "unauthorized transaction"
     ]
+  },
+  "topic_control": {
+    "allowed_intents": [
+      "REPORT_FRAUD",
+      "BLOCK_CARD",
+      "CLOSE_ACCOUNT",
+      "ACCOUNT_QUERY",
+      "TRANSACTION_DISPUTE"
+    ],
+    "allowed_topics": [
+      "credit card",
+      "fraud",
+      "account",
+      "transaction",
+      "otp",
+      "identity verification",
+      "card blocking",
+      "unauthorized transaction"
+    ],
+    "drift_threshold": 0.4
   },
   "scoring_weights": {
     "sentiment": 0.4,

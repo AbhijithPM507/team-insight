@@ -27,6 +27,7 @@ def run_full_analysis(ai_output: dict, domain: str):
             "risk_contributors": rule_results["risk_contributors"]
         },
         "compliance": rule_results["compliance"],
+        "topic_control": rule_results["topic_control"],
         "outcome": rule_results["outcome"],
         "domain_used_for_rules": domain
     }

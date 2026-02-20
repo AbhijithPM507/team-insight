@@ -1,26 +1,43 @@
 {
   "domain": "telecom",
   "risk_triggers": {
-    "legal_words": ["TRAI", "consumer court", "complaint filed"],
-    "escalation_keywords": ["manager", "port out", "cancel connection"],
+    "legal_words": ["trai", "consumer court", "billing fraud"],
+    "escalation_keywords": ["port_out", "cancel_connection", "complaint"],
     "negative_sentiment_threshold": "very_negative"
   },
   "outcome_rules": {
-    "escalated_keywords": ["escalate", "complaint registered"],
-    "churn_keywords": ["port out", "cancel connection", "switch provider"],
-    "resolved_keywords": ["network fixed", "issue resolved", "plan updated"],
-    "followup_keywords": ["technician visit", "call back", "service request"]
+    "escalated_keywords": ["complaint", "legal"],
+    "churn_keywords": ["port_out", "cancel_connection"],
+    "resolved_keywords": ["network fixed", "issue resolved"],
+    "followup_keywords": ["technician visit", "service request"]
   },
   "compliance_rules": {
     "forbidden_promises": [
       "lifetime free plan",
       "unlimited forever",
       "no hidden charges guaranteed"
-    ],
-    "regulatory_keywords": [
-      "TRAI violation",
-      "billing fraud"
     ]
+  },
+  "topic_control": {
+    "allowed_intents": [
+      "PORT_OUT",
+      "CANCEL_CONNECTION",
+      "REPORT_NETWORK_ISSUE",
+      "BILLING_DISPUTE",
+      "PLAN_CHANGE"
+    ],
+    "allowed_topics": [
+      "network",
+      "signal",
+      "billing",
+      "plan",
+      "data usage",
+      "port out",
+      "connection",
+      "service request",
+      "trai"
+    ],
+    "drift_threshold": 0.4
   },
   "scoring_weights": {
     "sentiment": 0.5,

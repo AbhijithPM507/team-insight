@@ -1,12 +1,12 @@
 {
   "domain": "healthcare",
   "risk_triggers": {
-    "legal_words": ["malpractice", "HIPAA", "lawsuit"],
-    "escalation_keywords": ["complaint", "legal action"],
+    "legal_words": ["malpractice", "hipaa", "lawsuit"],
+    "escalation_keywords": ["legal_action", "complaint"],
     "negative_sentiment_threshold": "very_negative"
   },
   "outcome_rules": {
-    "escalated_keywords": ["complaint", "legal"],
+    "escalated_keywords": ["legal", "complaint"],
     "churn_keywords": [],
     "resolved_keywords": ["appointment scheduled", "issue resolved"],
     "followup_keywords": ["follow up", "test results pending"]
@@ -14,8 +14,28 @@
   "compliance_rules": {
     "forbidden_promises": [
       "guaranteed cure",
-      "100% recovery"
+      "100% recovery",
+      "instant cure"
     ]
+  },
+  "topic_control": {
+    "allowed_intents": [
+      "BOOK_APPOINTMENT",
+      "REPORT_SYMPTOM",
+      "MEDICAL_QUERY",
+      "FILE_MEDICAL_COMPLAINT"
+    ],
+    "allowed_topics": [
+      "appointment",
+      "doctor",
+      "symptom",
+      "diagnosis",
+      "treatment",
+      "medical report",
+      "prescription",
+      "hospital"
+    ],
+    "drift_threshold": 0.4
   },
   "scoring_weights": {
     "sentiment": 0.4,

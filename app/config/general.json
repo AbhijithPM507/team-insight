@@ -14,9 +14,14 @@
   "compliance_rules": {
     "forbidden_promises": []
   },
+  "topic_control": {
+    "allowed_intents": [],
+    "allowed_topics": [],
+    "drift_threshold": 0.5
+  },
   "scoring_weights": {
-    "sentiment": 0.4,
+    "sentiment": 0.3,
     "keywords": 0.3,
-    "intent": 0.3
+    "intent": 0.4
   }
 }
