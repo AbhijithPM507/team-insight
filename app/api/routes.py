@@ -1,39 +1,66 @@
-from fastapi import APIRouter, HTTPException
-from app.models.request_models import AnalyzeRequest
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from typing import Optional
+import json
+
 from app.services.analysis_service import run_full_analysis
+from app.services.ai_service import run_ai_layer  # Dev 2 will implement this
 
 router = APIRouter()
 
 
 @router.post("/analyze")
-def analyze(request: AnalyzeRequest):
+async def analyze(
+    transcript: Optional[str] = Form(None),
+    audio_file: Optional[UploadFile] = File(None),
+    client_config: Optional[str] = Form(None)
+):
+    """
+    Accepts:
+    - transcript (text)
+    - audio_file (uploaded file)
+    - client_config (JSON string)
+    """
 
-    # 🔹 Get AI output from Dev 2 layer
-    # Replace this with actual Dev 2 integration
-    ai_output = request.client_config.get("dev2_output")
-
-    if not ai_output:
+    if not transcript and not audio_file:
         raise HTTPException(
             status_code=400,
-            detail="Dev 2 AI output must be provided inside client_config.dev2_output"
+            detail="Either transcript or audio_file must be provided."
         )
 
-    # 🔹 Domain resolution
-    client_domain = request.client_config.get("domain") if request.client_config else None
-    detected_domain = ai_output.get("detected_domain")
+    try:
+        parsed_config = json.loads(client_config) if client_config else {}
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid client_config JSON")
 
-    if client_domain:
-        final_domain = client_domain
-    elif detected_domain:
-        final_domain = detected_domain
-    else:
-        final_domain = "general"
+    # 🔹 Read audio if provided
+    audio_bytes = None
+    if audio_file:
+        audio_bytes = await audio_file.read()
 
     try:
+        # 🔹 Call Dev 2 AI Layer
+        ai_output = await run_ai_layer(
+            transcript=transcript,
+            audio_bytes=audio_bytes,
+            client_config=parsed_config
+        )
+
+        # 🔹 Domain resolution
+        client_domain = parsed_config.get("domain")
+        detected_domain = ai_output.get("detected_domain")
+
+        if client_domain:
+            final_domain = client_domain
+        elif detected_domain:
+            final_domain = detected_domain
+        else:
+            final_domain = "general"
+
+        # 🔹 Call Dev 3 + Dev 4 integration layer
         return run_full_analysis(ai_output, final_domain)
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    except Exception:
-        raise HTTPException(status_code=500, detail="Internal processing error")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
