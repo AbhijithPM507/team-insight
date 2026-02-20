@@ -1,5 +1,8 @@
 fastapi
 uvicorn
 pydantic
-requests
 python-multipart
+requests
+python-dotenv
+elevenlabs
+google-genai
