@@ -5,7 +5,7 @@ from app.api.error_handlers import generic_exception_handler
 
 
 app = FastAPI(
-    title="ConvoDNA - Multimodal Conversation Intelligence API",
+    title="InsightX – Context-Aware Multimodal Conversation Intelligence API",
     version="1.0.0",
     description="Backend API for analyzing multimodal customer conversations"
 )

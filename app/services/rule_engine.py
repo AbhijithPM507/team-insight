@@ -1,6 +1,10 @@
 from app.services.risk_scorer import classify_risk
 
 
+# ---------------------------------------------------------
+# 🔹 Compliance Detection
+# ---------------------------------------------------------
+
 def detect_compliance_violations(summary: str, config: dict):
     violations = []
     rules = config.get("compliance_rules", {})
@@ -17,6 +21,10 @@ def detect_compliance_violations(summary: str, config: dict):
 
     return violations
 
+
+# ---------------------------------------------------------
+# 🔹 Topic Drift Analysis
+# ---------------------------------------------------------
 
 def calculate_topic_drift(ai_output: dict, config: dict):
 
@@ -42,7 +50,6 @@ def calculate_topic_drift(ai_output: dict, config: dict):
         ]
         topic_mismatch_ratio = len(unrelated_topics) / len(key_topics)
 
-    # Final drift score
     drift_score = round((intent_mismatch + topic_mismatch_ratio) / 2, 2)
 
     return {
@@ -53,18 +60,20 @@ def calculate_topic_drift(ai_output: dict, config: dict):
     }
 
 
+# ---------------------------------------------------------
+# 🔹 Outcome Classification
+# ---------------------------------------------------------
+
 def classify_outcome(ai_output: dict, risk_level: str, config: dict):
 
     resolution_status = ai_output.get("resolution_status", "").upper()
 
-    # Prefer AI resolution
     if resolution_status in ["RESOLVED", "ESCALATED", "PENDING"]:
         return {
             "type": resolution_status,
             "reason": "Derived from AI behavioral analysis"
         }
 
-    # Fallback logic (optional)
     if risk_level == "HIGH":
         return {
             "type": "ESCALATED",
@@ -77,58 +86,99 @@ def classify_outcome(ai_output: dict, risk_level: str, config: dict):
     }
 
 
+# ---------------------------------------------------------
+# 🔹 Main Rule Engine
+# ---------------------------------------------------------
+
 def run_rule_engine(ai_output: dict, config: dict):
 
     summary = ai_output.get("summary", "")
     primary_intent = ai_output.get("primary_intent", "").lower()
+    ai_risk = ai_output.get("risk_score", 0)
 
     risk_score = 0
-    risk_contributors = {}
+    risk_contributors = []
 
-    # 🔹 AI Behavioral Risk (0–1 → 0–3 scale)
-    ai_risk = ai_output.get("risk_score", 0)
-    ai_risk_component = round(ai_risk * 3)
+    weights = config.get("risk_weights", {})
+    triggers = config.get("risk_triggers", {})
+
+    # -------------------------------------------------
+    # 🔹 1. AI Behavioral Risk (Configurable Weight)
+    # -------------------------------------------------
+    behavioral_weight = weights.get("ai_behavioral_multiplier", 3)
+    ai_risk_component = round(ai_risk * behavioral_weight)
 
     risk_score += ai_risk_component
-    risk_contributors["ai_behavioral_risk"] = ai_risk_component
+    risk_contributors.append({
+        "factor": "ai_behavioral_risk",
+        "impact": ai_risk_component
+    })
 
-    # 🔹 Legal keyword risk
+    # -------------------------------------------------
+    # 🔹 2. Keyword-Based Risk
+    # -------------------------------------------------
+    keyword_weight = weights.get("keyword_match", 2)
     keyword_risk = 0
-    legal_words = config.get("risk_triggers", {}).get("legal_words", [])
 
-    for word in legal_words:
-        if word.lower() in summary.lower():
-            keyword_risk += 2
+    for category, keywords in triggers.items():
+        if not isinstance(keywords, list):
+            continue
+
+        for word in keywords:
+            if word.lower() in summary.lower():
+                keyword_risk += keyword_weight
+                risk_contributors.append({
+                    "factor": f"{category}_keyword_match",
+                    "impact": keyword_weight
+                })
 
     risk_score += keyword_risk
-    risk_contributors["keyword_risk"] = keyword_risk
 
-    # 🔹 Intent escalation risk
+    # -------------------------------------------------
+    # 🔹 3. Intent-Based Escalation Risk
+    # -------------------------------------------------
+    intent_weight = weights.get("intent_match", 2)
     intent_risk = 0
-    escalation_keywords = config.get("risk_triggers", {}).get("escalation_keywords", [])
 
-    if any(keyword.lower() in primary_intent for keyword in escalation_keywords):
-        intent_risk += 2
+    escalation_intents = triggers.get("escalation_intents", [])
+
+    if any(keyword.lower() in primary_intent for keyword in escalation_intents):
+        intent_risk += intent_weight
+        risk_contributors.append({
+            "factor": "intent_escalation_match",
+            "impact": intent_weight
+        })
 
     risk_score += intent_risk
-    risk_contributors["intent_risk"] = intent_risk
 
-    # 🔹 Risk classification
+    # -------------------------------------------------
+    # 🔹 4. Escalation Threshold
+    # -------------------------------------------------
+    escalation_threshold = config.get("escalation_threshold", 6)
+
     risk_level = classify_risk(risk_score)
 
-    # 🔹 Compliance
+    escalation_required = risk_score >= escalation_threshold
+
+    # -------------------------------------------------
+    # 🔹 5. Compliance Check
+    # -------------------------------------------------
     compliance_violations = detect_compliance_violations(summary, config)
 
-    # 🔹 Topic Drift (percentage-based)
+    # -------------------------------------------------
+    # 🔹 6. Topic Drift
+    # -------------------------------------------------
     topic_drift = calculate_topic_drift(ai_output, config)
 
-    # 🔹 Outcome
+    # -------------------------------------------------
+    # 🔹 7. Outcome
+    # -------------------------------------------------
     outcome = classify_outcome(ai_output, risk_level, config)
 
     return {
         "risk_score": risk_score,
         "risk_level": risk_level,
-        "escalation_required": risk_level == "HIGH",
+        "escalation_required": escalation_required,
         "risk_contributors": risk_contributors,
         "compliance": {
             "violations": compliance_violations,

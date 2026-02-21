@@ -57,7 +57,7 @@ async def analyze(
             final_domain = "general"
 
         # 🔹 Call Dev 3 + Dev 4 integration layer
-        return run_full_analysis(ai_output, final_domain)
+        return run_full_analysis(ai_output, final_domain, parsed_config)
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

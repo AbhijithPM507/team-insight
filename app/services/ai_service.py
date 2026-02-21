@@ -23,6 +23,7 @@ async def run_ai_layer(transcript=None, audio_bytes=None, client_config=None) ->
 
     # 🔹 Initialize clients ONLY when needed
     gemini_api_key = os.getenv("GEMINI_API_KEY")
+    print("Active key:", os.getenv("GEMINI_API_KEY"))
     eleven_api_key = os.getenv("ELEVENLABS_API_KEY")
 
     if not gemini_api_key:
