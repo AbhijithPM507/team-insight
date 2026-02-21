@@ -20,16 +20,23 @@ The system is configurable per business domain and built for integration into ba
 ---
 
 ## 🏗 Architecture
+
+```text
 Client Application
-↓
+        │
+        ▼
 FastAPI Backend
-↓
+        │
+        ▼
 Multimodal AI Layer (Gemini + ElevenLabs)
-↓
+        │
+        ▼
 Domain Rule Engine
-↓
+        │
+        ▼
 Risk & Impact Engine
-↓
+        │
+        ▼
 Structured Enterprise JSON Output
 
 
